@@ -54,7 +54,7 @@ export default function Hero() {
             type="button"
             className="rounded-full border border-white/15 px-8 py-4 text-sm font-black uppercase tracking-widest text-white transition hover:border-white/45 hover:bg-white/[0.06]"
           >
-            Explore Artist Sounds
+            Explore Builds
           </button>
         </div>
       </motion.div>

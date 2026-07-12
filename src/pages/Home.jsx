@@ -1,5 +1,7 @@
-import Hero from "../components/home/Hero";
+import ExploreByTone from "../components/home/ExploreByTone";
+import FeaturedBuilds from "../components/home/FeaturedBuilds";
 import Features from "../components/home/Features";
+import Hero from "../components/home/Hero";
 import Navbar from "../components/layout/Navbar";
 
 export default function Home() {
@@ -8,6 +10,8 @@ export default function Home() {
       <Navbar />
       <Hero />
       <Features />
+      <ExploreByTone />
+      <FeaturedBuilds />
     </main>
   );
 }
