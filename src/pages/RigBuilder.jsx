@@ -6,17 +6,23 @@ import InstrumentStep from "../components/builder/InstrumentStep";
 import ReviewStep from "../components/builder/ReviewStep";
 import ToneStep from "../components/builder/ToneStep";
 import Navbar from "../components/layout/Navbar";
+import RigResults from "../components/results/RigResults";
+import { generateRig } from "../utils/generateRig";
+
+function createInitialBuilderData() {
+    return {
+      instrument: "",
+      budget: 1500,
+      tone: "",
+      bands: [],
+      brands: [],
+    };
+  }
 
 export default function RigBuilder() {
   const [currentStep, setCurrentStep] = useState(1);
-
-  const [builderData, setBuilderData] = useState({
-    instrument: "",
-    budget: 1500,
-    tone: "",
-    bands: [],
-    brands: [],
-  });
+  const [builderData, setBuilderData] = useState(createInitialBuilderData);
+  const [generatedRig, setGeneratedRig] = useState(null);
 
   function handleInstrumentSelect(instrument) {
     setBuilderData((previousData) => ({
@@ -72,9 +78,26 @@ export default function RigBuilder() {
   }
 
   function handleGenerateRig() {
-    console.log("Ready to generate rig:", builderData);
+    const rig = generateRig(builderData);
 
-    alert("Your rig profile is ready. The animated results screen comes next.");
+    setGeneratedRig(rig);
+    setCurrentStep(7);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+
+  function handleStartOver() {
+    setBuilderData(createInitialBuilderData());
+    setGeneratedRig(null);
+    setCurrentStep(1);
+  
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   }
 
   return (
@@ -129,6 +152,14 @@ export default function RigBuilder() {
           builderData={builderData}
           onBack={() => setCurrentStep(5)}
           onGenerate={handleGenerateRig}
+        />
+      )}
+
+      {currentStep === 7 && generatedRig && (
+        <RigResults
+          rig={generatedRig}
+          onEditPreferences={() => setCurrentStep(6)}
+          onStartOver={handleStartOver}
         />
       )}
     </main>
