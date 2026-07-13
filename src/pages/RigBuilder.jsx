@@ -3,6 +3,7 @@ import BandsStep from "../components/builder/BandsStep";
 import BrandsStep from "../components/builder/BrandsStep";
 import BudgetStep from "../components/builder/BudgetStep";
 import InstrumentStep from "../components/builder/InstrumentStep";
+import ReviewStep from "../components/builder/ReviewStep";
 import ToneStep from "../components/builder/ToneStep";
 import Navbar from "../components/layout/Navbar";
 
@@ -70,10 +71,10 @@ export default function RigBuilder() {
     });
   }
 
-  function handleBrandsContinue() {
-    console.log("Complete builder data:", builderData);
+  function handleGenerateRig() {
+    console.log("Ready to generate rig:", builderData);
 
-    // Step 6 will be the review screen.
+    alert("Your rig profile is ready. The animated results screen comes next.");
   }
 
   return (
@@ -119,7 +120,15 @@ export default function RigBuilder() {
           selectedBrands={builderData.brands}
           onToggleBrand={handleToggleBrand}
           onBack={() => setCurrentStep(4)}
-          onContinue={handleBrandsContinue}
+          onContinue={() => setCurrentStep(6)}
+        />
+      )}
+
+      {currentStep === 6 && (
+        <ReviewStep
+          builderData={builderData}
+          onBack={() => setCurrentStep(5)}
+          onGenerate={handleGenerateRig}
         />
       )}
     </main>
