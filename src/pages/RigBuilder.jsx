@@ -1,6 +1,8 @@
 import { useState } from "react";
+import BandsStep from "../components/builder/BandsStep";
 import BudgetStep from "../components/builder/BudgetStep";
 import InstrumentStep from "../components/builder/InstrumentStep";
+import ToneStep from "../components/builder/ToneStep";
 import Navbar from "../components/layout/Navbar";
 
 export default function RigBuilder() {
@@ -9,6 +11,8 @@ export default function RigBuilder() {
   const [builderData, setBuilderData] = useState({
     instrument: "",
     budget: 1500,
+    tone: "",
+    bands: [],
   });
 
   function handleInstrumentSelect(instrument) {
@@ -27,13 +31,32 @@ export default function RigBuilder() {
     }));
   }
 
-  function handleBudgetContinue() {
+  function handleToneSelect(tone) {
+    setBuilderData((previousData) => ({
+      ...previousData,
+      tone,
+    }));
+  }
+
+  function handleToggleBand(band) {
+    setBuilderData((previousData) => {
+      const bandAlreadySelected = previousData.bands.includes(band);
+
+      return {
+        ...previousData,
+        bands: bandAlreadySelected
+          ? previousData.bands.filter(
+              (selectedBand) => selectedBand !== band,
+            )
+          : [...previousData.bands, band],
+      };
+    });
+  }
+
+  function handleBandsContinue() {
     console.log("Current builder data:", builderData);
 
-    // Step 3 will be added next.
-    alert(
-      `${builderData.instrument} rig selected with a $${builderData.budget.toLocaleString()} budget.`,
-    );
+    // Step 5 will be preferred brands.
   }
 
   return (
@@ -52,7 +75,25 @@ export default function RigBuilder() {
           budget={builderData.budget}
           onBudgetChange={handleBudgetChange}
           onBack={() => setCurrentStep(1)}
-          onContinue={handleBudgetContinue}
+          onContinue={() => setCurrentStep(3)}
+        />
+      )}
+
+      {currentStep === 3 && (
+        <ToneStep
+          selectedTone={builderData.tone}
+          onSelect={handleToneSelect}
+          onBack={() => setCurrentStep(2)}
+          onContinue={() => setCurrentStep(4)}
+        />
+      )}
+
+      {currentStep === 4 && (
+        <BandsStep
+          selectedBands={builderData.bands}
+          onToggleBand={handleToggleBand}
+          onBack={() => setCurrentStep(3)}
+          onContinue={handleBandsContinue}
         />
       )}
     </main>
