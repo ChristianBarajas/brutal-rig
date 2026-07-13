@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Hero() {
   return (
@@ -38,17 +39,17 @@ export default function Hero() {
         </p>
 
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <button
-            type="button"
-            className="group flex items-center gap-3 rounded-full bg-white px-8 py-4 text-sm font-black uppercase tracking-widest text-black shadow-[0_0_55px_rgba(255,255,255,0.18)] transition hover:scale-[1.02] hover:bg-zinc-200"
-          >
-            Build My Rig
+        <Link
+  to="/builder"
+  className="group flex items-center gap-3 rounded-full bg-white px-8 py-4 text-sm font-black uppercase tracking-widest text-black shadow-[0_0_55px_rgba(255,255,255,0.18)] transition hover:scale-[1.02] hover:bg-zinc-200"
+>
+  Build My Rig
 
-            <ArrowRight
-              size={18}
-              className="transition group-hover:translate-x-1"
-            />
-          </button>
+  <ArrowRight
+    size={18}
+    className="transition group-hover:translate-x-1"
+  />
+</Link>
 
           <button
             type="button"
