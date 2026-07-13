@@ -1,5 +1,6 @@
 import { useState } from "react";
 import BandsStep from "../components/builder/BandsStep";
+import BrandsStep from "../components/builder/BrandsStep";
 import BudgetStep from "../components/builder/BudgetStep";
 import InstrumentStep from "../components/builder/InstrumentStep";
 import ToneStep from "../components/builder/ToneStep";
@@ -13,6 +14,7 @@ export default function RigBuilder() {
     budget: 1500,
     tone: "",
     bands: [],
+    brands: [],
   });
 
   function handleInstrumentSelect(instrument) {
@@ -53,10 +55,25 @@ export default function RigBuilder() {
     });
   }
 
-  function handleBandsContinue() {
-    console.log("Current builder data:", builderData);
+  function handleToggleBrand(brand) {
+    setBuilderData((previousData) => {
+      const brandAlreadySelected = previousData.brands.includes(brand);
 
-    // Step 5 will be preferred brands.
+      return {
+        ...previousData,
+        brands: brandAlreadySelected
+          ? previousData.brands.filter(
+              (selectedBrand) => selectedBrand !== brand,
+            )
+          : [...previousData.brands, brand],
+      };
+    });
+  }
+
+  function handleBrandsContinue() {
+    console.log("Complete builder data:", builderData);
+
+    // Step 6 will be the review screen.
   }
 
   return (
@@ -93,7 +110,16 @@ export default function RigBuilder() {
           selectedBands={builderData.bands}
           onToggleBand={handleToggleBand}
           onBack={() => setCurrentStep(3)}
-          onContinue={handleBandsContinue}
+          onContinue={() => setCurrentStep(5)}
+        />
+      )}
+
+      {currentStep === 5 && (
+        <BrandsStep
+          selectedBrands={builderData.brands}
+          onToggleBrand={handleToggleBrand}
+          onBack={() => setCurrentStep(4)}
+          onContinue={handleBrandsContinue}
         />
       )}
     </main>
