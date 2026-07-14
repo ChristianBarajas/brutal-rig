@@ -1,52 +1,40 @@
 import { gear } from "../data/gear";
+import {
+  evaluateItem,
+  rankItems,
+  scoreItem,
+} from "../recommendation/scoring";
 
 function formatTone(tone) {
   return tone
     .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map(
+      (word) =>
+        word.charAt(0).toUpperCase() + word.slice(1),
+    )
     .join(" ");
 }
 
-function scoreItem(item, builderData) {
-  let score = 0;
-
-  if (item.tones?.includes(builderData.tone)) {
-    score += 10;
-  }
-
-  if (item.brand && builderData.brands.includes(item.brand)) {
-    score += 8;
-  }
-
-  return score;
-}
-
-function sortByMatch(items, builderData) {
-  return [...items].sort((firstItem, secondItem) => {
-    const scoreDifference =
-      scoreItem(secondItem, builderData) -
-      scoreItem(firstItem, builderData);
-
-    if (scoreDifference !== 0) {
-      return scoreDifference;
-    }
-
-    // When two items match equally well, prefer the cheaper one.
-    return firstItem.price - secondItem.price;
-  });
-}
-
-function findBestCoreCombination(instrumentData, builderData) {
-  const instruments = sortByMatch(
+function findBestCoreCombination(
+  instrumentData,
+  builderData,
+) {
+  const instruments = rankItems(
     instrumentData.instruments,
     builderData,
   );
 
-  const amps = sortByMatch(instrumentData.amps, builderData);
+  const amps = rankItems(
+    instrumentData.amps,
+    builderData,
+  );
 
   const cabinets =
     instrumentData.cabinets.length > 0
-      ? sortByMatch(instrumentData.cabinets, builderData)
+      ? rankItems(
+          instrumentData.cabinets,
+          builderData,
+        )
       : [null];
 
   const combinations = [];
@@ -63,7 +51,9 @@ function findBestCoreCombination(instrumentData, builderData) {
             ...instrument,
           },
           {
-            category: cabinet ? "Amplifier Head" : "Amplifier",
+            category: cabinet
+              ? "Amplifier Head"
+              : "Amplifier",
             ...amp,
           },
           ...(cabinet
@@ -81,10 +71,18 @@ function findBestCoreCombination(instrumentData, builderData) {
           0,
         );
 
+        const coreItems = [
+          instrument,
+          amp,
+          ...(cabinet ? [cabinet] : []),
+        ];
+
         const matchScore =
-          scoreItem(instrument, builderData) +
-          scoreItem(amp, builderData) +
-          (cabinet ? scoreItem(cabinet, builderData) : 0);
+          coreItems.reduce(
+            (total, item) =>
+              total + scoreItem(item, builderData),
+            0,
+          ) / coreItems.length;
 
         combinations.push({
           items,
@@ -111,7 +109,6 @@ function findBestCoreCombination(instrumentData, builderData) {
           return scoreDifference;
         }
 
-        // Among equally strong matches, use more of the budget.
         return (
           secondCombination.totalPrice -
           firstCombination.totalPrice
@@ -120,7 +117,6 @@ function findBestCoreCombination(instrumentData, builderData) {
     )[0];
   }
 
-  // Only used when even the cheapest possible core rig exceeds the budget.
   return combinations.sort(
     (firstCombination, secondCombination) =>
       firstCombination.totalPrice -
@@ -141,7 +137,10 @@ function addOptionalItems(
     0,
   );
 
-  const rankedItems = sortByMatch(optionalItems, builderData);
+  const rankedItems = rankItems(
+    optionalItems,
+    builderData,
+  );
 
   let addedCount = 0;
 
@@ -150,7 +149,10 @@ function addOptionalItems(
       break;
     }
 
-    if (currentTotal + item.price <= builderData.budget) {
+    if (
+      currentTotal + item.price <=
+      builderData.budget
+    ) {
       selectedItems.push(item);
       currentTotal += item.price;
       addedCount += 1;
@@ -161,10 +163,13 @@ function addOptionalItems(
 }
 
 export function generateRig(builderData) {
-  const instrumentData = gear[builderData.instrument];
+  const instrumentData =
+    gear[builderData.instrument];
 
   if (!instrumentData) {
-    throw new Error("Unsupported instrument selection.");
+    throw new Error(
+      "Unsupported instrument selection.",
+    );
   }
 
   const coreRig = findBestCoreCombination(
@@ -172,36 +177,71 @@ export function generateRig(builderData) {
     builderData,
   );
 
+  if (!coreRig) {
+    throw new Error(
+      "No complete rig could be generated.",
+    );
+  }
+
   const matchingPedals = instrumentData.pedals
-    .filter((pedal) => pedal.tones?.includes(builderData.tone))
+    .filter((pedal) =>
+      pedal.tones?.includes(builderData.tone),
+    )
     .map((pedal) => ({
       category: "Pedal",
       ...pedal,
     }));
 
-  const accessories = instrumentData.accessories.map(
-    (accessory) => ({
+  const accessories =
+    instrumentData.accessories.map((accessory) => ({
       category: "Accessory",
       ...accessory,
-    }),
-  );
+    }));
 
-  // Add essential accessories first while staying under budget.
+  // Prioritize tone-shaping gear.
   let selectedItems = addOptionalItems(
     coreRig.items,
-    accessories,
-    builderData,
-  );
-
-  // Then add up to two matching pedals if money remains.
-  selectedItems = addOptionalItems(
-    selectedItems,
     matchingPedals,
     builderData,
     builderData.budget >= 1800 ? 2 : 1,
   );
 
-  const totalPrice = selectedItems.reduce(
+  // Spend any remaining budget on accessories.
+  selectedItems = addOptionalItems(
+    selectedItems,
+    accessories,
+    builderData,
+  );
+
+  const evaluatedItems = selectedItems.map(
+    (item) => {
+      const recommendation = evaluateItem(
+        item,
+        builderData,
+      );
+
+      const reasons =
+        recommendation.reasons.length > 0
+          ? recommendation.reasons
+          : item.category === "Accessory"
+            ? [
+                "Included as a practical essential while keeping the complete rig within budget.",
+              ]
+            : [
+                "Selected as the strongest available option within your budget.",
+              ];
+
+      return {
+        ...item,
+        recommendation: {
+          ...recommendation,
+          reasons,
+        },
+      };
+    },
+  );
+
+  const totalPrice = evaluatedItems.reduce(
     (total, item) => total + item.price,
     0,
   );
@@ -209,12 +249,16 @@ export function generateRig(builderData) {
   return {
     id: `rig-${Date.now()}`,
     name: `${formatTone(builderData.tone)} ${
-      builderData.instrument === "guitar" ? "Guitar" : "Bass"
+      builderData.instrument === "guitar"
+        ? "Guitar"
+        : "Bass"
     } Rig`,
-    items: selectedItems,
+    items: evaluatedItems,
     totalPrice,
-    remainingBudget: builderData.budget - totalPrice,
-    isOverBudget: totalPrice > builderData.budget,
+    remainingBudget:
+      builderData.budget - totalPrice,
+    isOverBudget:
+      totalPrice > builderData.budget,
     builderData: {
       ...builderData,
       bands: [...builderData.bands],
