@@ -1,4 +1,4 @@
-import { getArtistProfile } from "../data/artists";
+import { getArtistProfile } from "../data/artists.js";
 
 function formatLabel(value) {
   return value
@@ -29,7 +29,7 @@ export function evaluateItem(item, builderData) {
   const reasons = [];
 
   if (item.tones?.includes(builderData.tone)) {
-    breakdown.tone = 40;
+    breakdown.tone = 30;
 
     reasons.push(
       `Matches your ${formatLabel(builderData.tone)} tone direction.`,
@@ -42,7 +42,10 @@ export function evaluateItem(item, builderData) {
   );
 
   if (matchingBands.length > 0) {
-    breakdown.artists = Math.min(matchingBands.length * 6, 30);
+    breakdown.artists = Math.min(
+      36 + (matchingBands.length - 1) * 6,
+      60,
+    );
 
     const displayedBands = matchingBands.slice(0, 2).join(" and ");
 

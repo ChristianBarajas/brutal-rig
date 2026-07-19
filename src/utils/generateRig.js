@@ -1,7 +1,10 @@
-import { gear } from "../data/gear";
-import { evaluateItem, scoreItem } from "../recommendation/scoring";
-import { getBudgetPlan } from "../recommendation/budgetRules";
-import { applyCatalogPricing } from "../recommendation/pricing";
+import { gear } from "../data/gear.js";
+import { evaluateItem, scoreItem } from "../recommendation/scoring.js";
+import {
+  getBudgetPlan,
+  isInstrumentEligible,
+} from "../recommendation/budgetRules.js";
+import { applyCatalogPricing } from "../recommendation/pricing.js";
 
 function formatTone(tone) {
   return tone
@@ -68,15 +71,21 @@ function isHeadAndCabCompatible(head, cabinet) {
   return true;
 }
 
-function createAmplificationOptions(instrumentData) {
+function createAmplificationOptions(instrumentData, budgetPlan) {
   const options = [];
 
   const combos = instrumentData.amps.filter(
-    (amp) => amp.format === "combo",
+    (amp) =>
+      amp.format === "combo" &&
+      budgetPlan.allowedAmpFormats.includes("combo"),
   );
 
   const heads = instrumentData.amps.filter(
-    (amp) => amp.format === "head",
+    (amp) =>
+      amp.format === "head" &&
+      budgetPlan.allowedAmpFormats.includes("head-cab") &&
+      (!budgetPlan.minimumHeadWatts ||
+        amp.watts >= budgetPlan.minimumHeadWatts),
   );
 
   for (const combo of combos) {
@@ -96,6 +105,13 @@ function createAmplificationOptions(instrumentData) {
 
   for (const head of heads) {
     for (const cabinet of instrumentData.cabinets) {
+      if (
+        budgetPlan.requiredCabinetSizes?.length &&
+        !budgetPlan.requiredCabinetSizes.includes(cabinet.size)
+      ) {
+        continue;
+      }
+
       if (
         !isHeadAndCabCompatible(head, cabinet)
       ) {
@@ -296,8 +312,14 @@ function findBestCoreRig(
   builderData,
   budgetPlan,
 ) {
-  const amplificationOptions =
-    createAmplificationOptions(instrumentData);
+  const amplificationOptions = createAmplificationOptions(
+    instrumentData,
+    budgetPlan,
+  );
+
+  const eligibleInstruments = instrumentData.instruments.filter(
+    (instrument) => isInstrumentEligible(instrument, budgetPlan),
+  );
 
   const preferredTuners =
     instrumentData.tuners.filter(
@@ -341,9 +363,15 @@ function findBestCoreRig(
     );
   }
 
+  if (eligibleInstruments.length === 0) {
+    throw new Error(
+      `No ${budgetPlan.label.toLowerCase()} guitar is available inside the required instrument price range.`,
+    );
+  }
+
   const candidates = [];
 
-  for (const instrument of instrumentData.instruments) {
+  for (const instrument of eligibleInstruments) {
     for (const amplification of amplificationOptions) {
       for (const tuner of tunerOptions) {
         const items = [
@@ -418,11 +446,9 @@ function findBestCoreRig(
     )[0];
   }
 
-  return candidates.sort(
-    (firstCandidate, secondCandidate) =>
-      firstCandidate.totalPrice -
-      secondCandidate.totalPrice,
-  )[0];
+  throw new Error(
+    `No complete ${budgetPlan.label.toLowerCase()} rig fits within the selected $${builderData.budget.toLocaleString()} budget.`,
+  );
 }
 
 function addOptionalItems(
@@ -511,6 +537,12 @@ function getCategoryReasons(
     if (item.pickupType === "humbucker") {
       reasons.push(
         "Its humbucker pickup is suited to high-gain rhythm tones and noise control.",
+      );
+    }
+
+    if (item.qualityTier === "professional") {
+      reasons.push(
+        "This model meets the professional instrument requirement for the selected budget tier.",
       );
     }
 
@@ -696,15 +728,15 @@ export function generateRig(builderData) {
 
   let selectedItems = addOptionalItems(
     coreRig.items,
-    matchingPedals,
+    optionalAccessories,
     builderData,
-    pedalLimit,
   );
 
   selectedItems = addOptionalItems(
     selectedItems,
-    optionalAccessories,
+    matchingPedals,
     builderData,
+    pedalLimit,
   );
 
   const evaluatedItems = attachRecommendations(

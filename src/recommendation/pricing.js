@@ -37,6 +37,10 @@ const usedPriceOverrides = {
   }
   
   function estimateUsedPrice(item, category) {
+    if (item.estimatedUsedPrice) {
+      return item.estimatedUsedPrice;
+    }
+
     const override =
       usedPriceOverrides[item.id];
   
@@ -81,17 +85,11 @@ const usedPriceOverrides = {
       return true;
     }
   
-    if (
-      pricingCategory === "instrument" &&
-      item.price >= 700
-    ) {
+    if (pricingCategory === "instrument") {
       return true;
     }
   
-    if (
-      pricingCategory === "combo" &&
-      item.price >= 500
-    ) {
+    if (pricingCategory === "combo") {
       return true;
     }
   

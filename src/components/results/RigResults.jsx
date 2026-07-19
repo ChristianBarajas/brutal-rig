@@ -132,8 +132,16 @@ export default function RigResults({
                       </p>
 
                       <p className="mt-2 text-xs font-bold uppercase tracking-wider text-zinc-600">
-                        Estimated price
+                        {item.pricing?.selectedCondition === "used"
+                          ? "Estimated used price"
+                          : "Estimated new price"}
                       </p>
+
+                      {item.pricing?.selectedCondition === "used" && (
+                        <p className="mt-2 text-xs text-zinc-600">
+                          New retail estimate: ${item.pricing.new.toLocaleString()}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </motion.article>
@@ -203,6 +211,14 @@ export default function RigResults({
                   exceeds your selected budget. Used pricing
                   support will improve this recommendation
                   later.
+                </p>
+              </div>
+            )}
+
+            {!rig.isOverBudget && rig.remainingBudget >= 500 && (
+              <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                <p className="text-sm leading-6 text-zinc-400">
+                  This rig meets the selected performance tier without using the entire budget. The remainder can stay saved or fund future upgrades.
                 </p>
               </div>
             )}
