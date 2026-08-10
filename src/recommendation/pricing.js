@@ -71,7 +71,10 @@ const usedPriceOverrides = {
     }
   
     if (shoppingPreference === "used-only") {
-      return category !== "cable";
+      return (
+        getPricingCategory(item, category) !==
+        "cable"
+      );
     }
   
     const pricingCategory =

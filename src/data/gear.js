@@ -504,6 +504,7 @@ export const gear = {
         pickupType: "humbucker",
         electronics: "active",
         stringCount: 4,
+        qualityTier: "starter",
         tones: ["hardcore", "metalcore", "nu-metal", "thrash"],
         useCases: ["starter", "serious", "practice", "recording"],
         description:
@@ -519,6 +520,7 @@ export const gear = {
         price: 399,
         electronics: "active",
         stringCount: 5,
+        qualityTier: "serious",
         tones: ["metalcore", "death-metal", "nu-metal"],
         useCases: ["starter", "serious", "recording"],
         description:
@@ -535,6 +537,7 @@ export const gear = {
         pickupType: "humbucker",
         electronics: "active",
         stringCount: 5,
+        qualityTier: "serious",
         tones: ["hardcore", "metalcore", "nu-metal"],
         useCases: ["serious", "recording", "live"],
         description:
@@ -550,6 +553,7 @@ export const gear = {
         price: 649,
         electronics: "active",
         stringCount: 5,
+        qualityTier: "professional",
         tones: ["hardcore", "metalcore", "death-metal"],
         useCases: ["stage-ready", "professional", "recording", "live"],
         description:
@@ -754,7 +758,7 @@ export const gear = {
       {
         id: "bass-instrument-cable",
         name: "20-Foot Instrument Cable",
-        price: 25,
+        price: 20,
         type: "cable",
         required: true,
         description:

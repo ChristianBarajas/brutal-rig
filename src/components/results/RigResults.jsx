@@ -6,6 +6,7 @@ import {
   RefreshCw,
   Sparkles,
 } from "lucide-react";
+import RigTechPanel from "./RigTechPanel";
 
 export default function RigResults({
   rig,
@@ -244,6 +245,8 @@ export default function RigResults({
             </div>
           </motion.aside>
         </div>
+
+        <RigTechPanel rig={rig} />
       </div>
     </section>
   );

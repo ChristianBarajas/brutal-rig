@@ -1,5 +1,6 @@
 import ExploreByTone from "../components/home/ExploreByTone";
 import FeaturedBuilds from "../components/home/FeaturedBuilds";
+import FeaturedBrands from "../components/home/FeaturedBrands";
 import Features from "../components/home/Features";
 import Hero from "../components/home/Hero";
 import Navbar from "../components/layout/Navbar";
@@ -12,6 +13,7 @@ export default function Home() {
       <Features />
       <ExploreByTone />
       <FeaturedBuilds />
+      <FeaturedBrands />
     </main>
   );
 }

@@ -18,6 +18,7 @@ function formatLabel(value) {
 
 export default function ReviewStep({
   builderData,
+  errorMessage,
   onBack,
   onGenerate,
 }) {
@@ -52,6 +53,11 @@ export default function ReviewStep({
           ? builderData.brands.map(formatLabel).join(", ")
           : "Let Brutal Rig choose",
       icon: <Layers3 size={20} />,
+    },
+    {
+      label: "Shopping",
+      value: formatLabel(builderData.shoppingPreference),
+      icon: <BadgeDollarSign size={20} />,
     },
   ];
 
@@ -127,6 +133,20 @@ export default function ReviewStep({
             will reveal the rig piece by piece and show the estimated total.
           </p>
         </div>
+
+        {errorMessage && (
+          <div
+            className="mt-6 rounded-2xl border border-white/20 bg-white/[0.05] p-5"
+            role="alert"
+          >
+            <p className="font-bold text-white">
+              We could not complete this combination.
+            </p>
+            <p className="mt-2 text-sm leading-6 text-zinc-400">
+              {errorMessage} Try raising the budget or selecting Best Value.
+            </p>
+          </div>
+        )}
 
         <div className="mt-10 flex flex-col-reverse justify-between gap-4 sm:flex-row">
           <button

@@ -16,18 +16,39 @@ function createInitialBuilderData() {
       tone: "",
       bands: [],
       brands: [],
+      shoppingPreference: "best-value",
     };
   }
+
+function getMinimumBudget(instrument, shoppingPreference) {
+  if (instrument === "guitar") {
+    return shoppingPreference === "new-only" ? 600 : 400;
+  }
+
+  if (instrument !== "bass") {
+    return 400;
+  }
+
+  return shoppingPreference === "new-only" ? 800 : 500;
+}
 
 export default function RigBuilder() {
   const [currentStep, setCurrentStep] = useState(1);
   const [builderData, setBuilderData] = useState(createInitialBuilderData);
   const [generatedRig, setGeneratedRig] = useState(null);
+  const [generationError, setGenerationError] = useState("");
 
   function handleInstrumentSelect(instrument) {
     setBuilderData((previousData) => ({
       ...previousData,
       instrument,
+      budget: Math.max(
+        previousData.budget,
+        getMinimumBudget(
+          instrument,
+          previousData.shoppingPreference,
+        ),
+      ),
     }));
 
     setCurrentStep(2);
@@ -36,7 +57,27 @@ export default function RigBuilder() {
   function handleBudgetChange(budget) {
     setBuilderData((previousData) => ({
       ...previousData,
-      budget,
+      budget: Math.max(
+        budget,
+        getMinimumBudget(
+          previousData.instrument,
+          previousData.shoppingPreference,
+        ),
+      ),
+    }));
+  }
+
+  function handleShoppingPreferenceChange(shoppingPreference) {
+    setBuilderData((previousData) => ({
+      ...previousData,
+      shoppingPreference,
+      budget: Math.max(
+        previousData.budget,
+        getMinimumBudget(
+          previousData.instrument,
+          shoppingPreference,
+        ),
+      ),
     }));
   }
 
@@ -78,10 +119,20 @@ export default function RigBuilder() {
   }
 
   function handleGenerateRig() {
-    const rig = generateRig(builderData);
+    setGenerationError("");
 
-    setGeneratedRig(rig);
-    setCurrentStep(7);
+    try {
+      const rig = generateRig(builderData);
+
+      setGeneratedRig(rig);
+      setCurrentStep(7);
+    } catch (error) {
+      setGenerationError(
+        error.message ??
+          "A complete rig could not be generated with these preferences.",
+      );
+      return;
+    }
 
     window.scrollTo({
       top: 0,
@@ -92,6 +143,7 @@ export default function RigBuilder() {
   function handleStartOver() {
     setBuilderData(createInitialBuilderData());
     setGeneratedRig(null);
+    setGenerationError("");
     setCurrentStep(1);
   
     window.scrollTo({
@@ -114,7 +166,10 @@ export default function RigBuilder() {
       {currentStep === 2 && (
         <BudgetStep
           budget={builderData.budget}
+          instrument={builderData.instrument}
+          shoppingPreference={builderData.shoppingPreference}
           onBudgetChange={handleBudgetChange}
+          onShoppingPreferenceChange={handleShoppingPreferenceChange}
           onBack={() => setCurrentStep(1)}
           onContinue={() => setCurrentStep(3)}
         />
@@ -150,6 +205,7 @@ export default function RigBuilder() {
       {currentStep === 6 && (
         <ReviewStep
           builderData={builderData}
+          errorMessage={generationError}
           onBack={() => setCurrentStep(5)}
           onGenerate={handleGenerateRig}
         />

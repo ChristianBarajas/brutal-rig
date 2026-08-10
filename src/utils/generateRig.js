@@ -365,7 +365,7 @@ function findBestCoreRig(
 
   if (eligibleInstruments.length === 0) {
     throw new Error(
-      `No ${budgetPlan.label.toLowerCase()} guitar is available inside the required instrument price range.`,
+      `No ${budgetPlan.label.toLowerCase()} ${builderData.instrument} is available inside the required instrument price range.`,
     );
   }
 
@@ -684,6 +684,7 @@ export function generateRig(builderData) {
 
   const budgetPlan = getBudgetPlan(
     builderData.budget,
+    builderData.instrument,
   );
 
   const coreRig = findBestCoreRig(

@@ -24,12 +24,44 @@ const budgetPresets = [
   },
 ];
 
+const shoppingOptions = [
+  {
+    id: "best-value",
+    label: "Best Value",
+    description: "Use a realistic mix of new essentials and estimated used gear.",
+  },
+  {
+    id: "new-only",
+    label: "New Only",
+    description: "Build entirely around current new retail estimates.",
+  },
+  {
+    id: "used-only",
+    label: "Used First",
+    description: "Prioritize estimated used prices except for required cables.",
+  },
+];
+
 export default function BudgetStep({
   budget,
+  instrument,
+  shoppingPreference,
   onBudgetChange,
+  onShoppingPreferenceChange,
   onBack,
   onContinue,
 }) {
+  const minimumBudget =
+    instrument === "bass"
+      ? shoppingPreference === "new-only"
+        ? 800
+        : 500
+      : shoppingPreference === "new-only"
+        ? 600
+        : 400;
+  const availablePresets = budgetPresets.filter(
+    (preset) => preset.value >= minimumBudget,
+  );
   const selectedPreset = budgetPresets.find(
     (preset) => preset.value === Number(budget),
   );
@@ -78,7 +110,7 @@ export default function BudgetStep({
           <div className="mt-12">
             <input
               type="range"
-              min="400"
+              min={minimumBudget}
               max="5000"
               step="100"
               value={budget}
@@ -88,13 +120,13 @@ export default function BudgetStep({
             />
 
             <div className="mt-4 flex justify-between text-xs font-bold uppercase tracking-widest text-zinc-600">
-              <span>$400</span>
+              <span>${minimumBudget.toLocaleString()}</span>
               <span>$5,000</span>
             </div>
           </div>
 
           <div className="mt-12 grid gap-4 md:grid-cols-4">
-            {budgetPresets.map((preset) => {
+            {availablePresets.map((preset) => {
               const isSelected = Number(budget) === preset.value;
 
               return (
@@ -130,6 +162,51 @@ export default function BudgetStep({
                 </button>
               );
             })}
+          </div>
+
+          <div className="mt-12 border-t border-white/10 pt-10">
+            <div className="max-w-2xl">
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-zinc-500">
+                Shopping preference
+              </p>
+              <p className="mt-3 text-sm leading-6 text-zinc-400">
+                Choose whether the engine should prioritize value or keep every
+                major item new.
+              </p>
+            </div>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              {shoppingOptions.map((option) => {
+                const isSelected =
+                  shoppingPreference === option.id;
+
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() =>
+                      onShoppingPreferenceChange(option.id)
+                    }
+                    className={`rounded-2xl border p-5 text-left transition ${
+                      isSelected
+                        ? "border-white bg-white text-black"
+                        : "border-white/10 bg-black/20 text-white hover:border-white/35"
+                    }`}
+                  >
+                    <p className="text-sm font-black uppercase tracking-wider">
+                      {option.label}
+                    </p>
+                    <p
+                      className={`mt-3 text-sm leading-6 ${
+                        isSelected ? "text-black/65" : "text-zinc-500"
+                      }`}
+                    >
+                      {option.description}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 

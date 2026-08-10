@@ -22,9 +22,12 @@ function findItem(rig, category) {
 }
 
 function verifyCompleteRig(rig) {
+  const instrumentCategory =
+    rig.builderData.instrument === "bass" ? "Bass" : "Guitar";
+
   assert.equal(rig.isOverBudget, false);
   assert.ok(rig.totalPrice <= rig.builderData.budget);
-  assert.ok(findItem(rig, "Guitar"));
+  assert.ok(findItem(rig, instrumentCategory));
   assert.ok(findItem(rig, "Tuner"));
   assert.ok(
     rig.items.some(
@@ -82,3 +85,67 @@ const mesaRig = buildRig(3000, {
 assert.equal(findItem(mesaRig, "Cabinet").brand, "mesa-boogie");
 
 console.log("All guitar rig scenarios passed.");
+
+function buildBassRig(budget, overrides = {}) {
+  return generateRig({
+    ...basePreferences,
+    instrument: "bass",
+    brands: [],
+    budget,
+    ...overrides,
+  });
+}
+
+for (const budget of [500, 800, 1000, 1400, 1500, 2000, 2500, 3000, 4100]) {
+  const rig = buildBassRig(budget);
+
+  assert.equal(rig.isOverBudget, false);
+  assert.ok(rig.totalPrice <= rig.builderData.budget);
+  assert.ok(findItem(rig, "Bass"));
+  assert.ok(findItem(rig, "Tuner"));
+  assert.ok(
+    rig.items.some(
+      (item) => item.category === "Cable" && item.type === "cable",
+    ),
+  );
+
+  if (budget >= 2500) {
+    assert.equal(rig.rigFormat, "head-cab");
+    assert.ok(findItem(rig, "Amplifier Head"));
+    assert.ok(findItem(rig, "Cabinet"));
+  }
+
+  console.log(
+    `Bass ${budget}: ${findItem(rig, "Bass").name} | ${
+      findItem(rig, "Amplifier")?.name ??
+      findItem(rig, "Amplifier Head")?.name
+    } | $${rig.totalPrice}`,
+  );
+}
+
+console.log("All bass rig scenarios passed.");
+
+for (const scenario of [
+  { instrument: "guitar", budget: 600, shoppingPreference: "new-only" },
+  { instrument: "guitar", budget: 500, shoppingPreference: "used-only" },
+  { instrument: "bass", budget: 800, shoppingPreference: "new-only" },
+  { instrument: "bass", budget: 500, shoppingPreference: "used-only" },
+]) {
+  const rig = generateRig({
+    ...basePreferences,
+    ...scenario,
+    brands: [],
+  });
+
+  verifyCompleteRig(rig);
+  assert.equal(
+    rig.items
+      .filter((item) => item.type === "cable")
+      .every(
+        (item) => item.pricing.selectedCondition === "new",
+      ),
+    true,
+  );
+}
+
+console.log("All shopping preference scenarios passed.");
