@@ -13,12 +13,19 @@ export default function Navbar() {
       <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/40 backdrop-blur-2xl">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
   
-          {/* Logo */}
           <Link
             to="/"
-            className="select-none text-xl font-black tracking-[0.35em] text-white transition duration-300 hover:text-zinc-300"
+            className="group flex select-none items-center gap-3 text-white"
+            aria-label="Brutal Rig home"
           >
-            BRUTAL RIG
+            <img
+              src="/brutal-rig-mark.svg"
+              alt=""
+              className="h-10 w-10 rounded-lg ring-1 ring-white/10 transition group-hover:ring-white/30"
+            />
+            <span className="hidden text-base font-black tracking-[0.3em] transition group-hover:text-zinc-300 sm:inline">
+              BRUTAL RIG
+            </span>
           </Link>
   
           {/* Desktop Navigation */}
