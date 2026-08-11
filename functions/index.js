@@ -30,7 +30,8 @@ export const rigTech = onRequest(
     region: "us-west1",
     secrets: [openaiApiKey],
     timeoutSeconds: 60,
-    maxInstances: 5,
+    maxInstances: 1,
+    concurrency: 2,
   },
   createRigTechHandler(generateRigTechAdvice),
 );

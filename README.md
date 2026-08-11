@@ -20,6 +20,7 @@ clear, budget-checked recommendation.
 - Item-level match scores and recommendation explanations
 - AI Rig Tech tone plans with a signal chain, starting settings, setup notes,
   and an upgrade priority
+- Basic per-client AI request limiting and single-instance cost protection
 - Automated guitar, bass, pricing-preference, API-validation, and structured
   output tests
 
@@ -111,7 +112,7 @@ scripts/                      End-to-end recommendation scenarios
 - Firebase Authentication and Firestore saved rigs
 - Live retailer or affiliate pricing instead of catalog estimates
 - A broader professional bass catalog
-- API abuse protection before opening AI usage publicly
+- Firebase App Check and distributed rate limiting before scaling AI usage
 - Product screenshots and a short architecture/demo video
 
 ## Developer

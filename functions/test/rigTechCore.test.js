@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   buildRigTechRequest,
+  createRequestRateLimiter,
   createRigTechHandler,
   parseRigTechAdvice,
   sanitizeRigPayload,
@@ -165,5 +166,51 @@ test("rejects non-POST requests before calling the model", async () => {
 
   assert.equal(record.statusCode, 405);
   assert.equal(record.headers.Allow, "POST");
+  assert.equal(called, false);
+});
+
+test("rate limits repeated requests from one client", () => {
+  let currentTime = 1000;
+  const checkRateLimit = createRequestRateLimiter({
+    limit: 2,
+    windowMs: 1000,
+    now: () => currentTime,
+  });
+
+  assert.equal(checkRateLimit("client-a").allowed, true);
+  assert.equal(checkRateLimit("client-a").allowed, true);
+
+  const blockedRequest = checkRateLimit("client-a");
+  assert.equal(blockedRequest.allowed, false);
+  assert.equal(blockedRequest.retryAfterSeconds, 1);
+  assert.equal(checkRateLimit("client-b").allowed, true);
+
+  currentTime += 1000;
+  assert.equal(checkRateLimit("client-a").allowed, true);
+});
+
+test("returns 429 before calling the model when rate limited", async () => {
+  const { record, response } = createResponseRecorder();
+  let called = false;
+  const handler = createRigTechHandler(
+    async () => {
+      called = true;
+      return validAdvice;
+    },
+    {
+      rateLimiter: () => ({
+        allowed: false,
+        retryAfterSeconds: 90,
+      }),
+    },
+  );
+
+  await handler(
+    { method: "POST", body: validPayload, ip: "127.0.0.1" },
+    response,
+  );
+
+  assert.equal(record.statusCode, 429);
+  assert.equal(record.headers["Retry-After"], "90");
   assert.equal(called, false);
 });

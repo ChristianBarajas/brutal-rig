@@ -1,7 +1,54 @@
 const ALLOWED_INSTRUMENTS = new Set(["guitar", "bass"]);
 const MAX_ITEMS = 14;
+const DEFAULT_RATE_LIMIT = 5;
+const DEFAULT_RATE_WINDOW_MS = 10 * 60 * 1000;
 
 class RigValidationError extends Error {}
+
+export function createRequestRateLimiter({
+  limit = DEFAULT_RATE_LIMIT,
+  windowMs = DEFAULT_RATE_WINDOW_MS,
+  now = Date.now,
+} = {}) {
+  const requestsByClient = new Map();
+
+  return function checkRateLimit(clientId) {
+    const currentTime = now();
+    const previousRequests = requestsByClient.get(clientId) ?? [];
+    const activeRequests = previousRequests.filter(
+      (timestamp) => currentTime - timestamp < windowMs,
+    );
+
+    if (activeRequests.length >= limit) {
+      return {
+        allowed: false,
+        retryAfterSeconds: Math.max(
+          1,
+          Math.ceil(
+            (windowMs - (currentTime - activeRequests[0])) / 1000,
+          ),
+        ),
+      };
+    }
+
+    activeRequests.push(currentTime);
+    requestsByClient.set(clientId, activeRequests);
+
+    if (requestsByClient.size > 1000) {
+      for (const [key, timestamps] of requestsByClient) {
+        if (
+          timestamps.every(
+            (timestamp) => currentTime - timestamp >= windowMs,
+          )
+        ) {
+          requestsByClient.delete(key);
+        }
+      }
+    }
+
+    return { allowed: true, retryAfterSeconds: 0 };
+  };
+}
 
 const upgradePriorities = [
   "No immediate upgrade",
@@ -245,13 +292,46 @@ export function parseRigTechAdvice(outputText) {
   return advice;
 }
 
-export function createRigTechHandler(generateAdvice) {
+function getClientId(request) {
+  if (typeof request.ip === "string" && request.ip.trim()) {
+    return request.ip.trim();
+  }
+
+  const forwardedFor = request.headers?.["x-forwarded-for"];
+  const forwardedValue = Array.isArray(forwardedFor)
+    ? forwardedFor[0]
+    : forwardedFor;
+
+  if (typeof forwardedValue === "string" && forwardedValue.trim()) {
+    return forwardedValue.split(",")[0].trim();
+  }
+
+  return "unknown-client";
+}
+
+export function createRigTechHandler(
+  generateAdvice,
+  { rateLimiter = createRequestRateLimiter() } = {},
+) {
   return async function rigTechHandler(request, response) {
     response.set("Cache-Control", "no-store");
 
     if (request.method !== "POST") {
       response.set("Allow", "POST");
       response.status(405).json({ error: "Method not allowed." });
+      return;
+    }
+
+    const rateLimit = rateLimiter(getClientId(request));
+
+    if (!rateLimit.allowed) {
+      response.set(
+        "Retry-After",
+        String(rateLimit.retryAfterSeconds),
+      );
+      response.status(429).json({
+        error: "Too many Rig Tech requests. Please wait and try again.",
+      });
       return;
     }
 
