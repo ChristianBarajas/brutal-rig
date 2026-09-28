@@ -3,7 +3,10 @@ import {
   ArrowLeft,
   BadgeDollarSign,
   Check,
+  CheckCircle2,
+  LoaderCircle,
   RefreshCw,
+  Save,
   Sparkles,
 } from "lucide-react";
 import RigTechPanel from "./RigTechPanel";
@@ -12,9 +15,14 @@ export default function RigResults({
   rig,
   onStartOver,
   onEditPreferences,
+  onSave,
+  saveStatus = "idle",
+  initialAdvice = null,
+  onAdviceChange,
+  savedView = false,
 }) {
   return (
-    <section className="relative min-h-screen px-6 py-32">
+    <section className="relative min-h-screen px-5 pb-32 pt-48 md:px-6">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.1),_transparent_32%),linear-gradient(to_bottom,_#050505,_#090909,_#050505)]" />
 
       <div className="relative z-10 mx-auto max-w-7xl">
@@ -25,13 +33,13 @@ export default function RigResults({
           className="text-center"
         >
           <p className="text-xs font-black uppercase tracking-[0.35em] text-zinc-500">
-            Your completed setup
+            {savedView ? "Saved build" : "Your completed setup"}
           </p>
 
           <h1 className="mt-6 text-5xl font-black uppercase leading-none tracking-tight text-white md:text-7xl">
-            Your brutal
+            {savedView ? rig.name : "Your brutal"}
             <span className="block text-zinc-600">
-              rig is ready.
+              {savedView ? "ready when you are." : "rig is ready."}
             </span>
           </h1>
 
@@ -225,13 +233,37 @@ export default function RigResults({
             )}
 
             <div className="mt-8 space-y-3">
+              {onSave && (
+                <button
+                  type="button"
+                  onClick={onSave}
+                  disabled={saveStatus === "saving" || saveStatus === "saved"}
+                  className="flex w-full items-center justify-center gap-3 rounded-full bg-red-500 px-6 py-4 text-xs font-black uppercase tracking-widest text-white transition hover:bg-red-400 disabled:cursor-default disabled:bg-red-500/60"
+                >
+                  {saveStatus === "saving" ? (
+                    <LoaderCircle className="animate-spin" size={17} />
+                  ) : saveStatus === "saved" ? (
+                    <CheckCircle2 size={17} />
+                  ) : (
+                    <Save size={17} />
+                  )}
+                  {saveStatus === "saving"
+                    ? "Saving"
+                    : saveStatus === "saved"
+                      ? "Saved to My Rigs"
+                      : saveStatus === "unsaved"
+                        ? "Save Updated Plan"
+                        : "Save This Rig"}
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={onEditPreferences}
                 className="flex w-full items-center justify-center gap-3 rounded-full bg-white px-6 py-4 text-xs font-black uppercase tracking-widest text-black transition hover:bg-zinc-200"
               >
                 <ArrowLeft size={17} />
-                Edit Preferences
+                {savedView ? "Build a Similar Rig" : "Edit Preferences"}
               </button>
 
               <button
@@ -240,13 +272,17 @@ export default function RigResults({
                 className="flex w-full items-center justify-center gap-3 rounded-full border border-white/15 px-6 py-4 text-xs font-black uppercase tracking-widest text-white transition hover:border-white/40 hover:bg-white/[0.05]"
               >
                 <RefreshCw size={17} />
-                Start Over
+                {savedView ? "Build a New Rig" : "Start Over"}
               </button>
             </div>
           </motion.aside>
         </div>
 
-        <RigTechPanel rig={rig} />
+        <RigTechPanel
+          rig={rig}
+          initialAdvice={initialAdvice}
+          onAdviceChange={onAdviceChange}
+        />
       </div>
     </section>
   );

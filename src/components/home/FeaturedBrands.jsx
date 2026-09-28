@@ -1,51 +1,60 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const brands = [
   {
     name: "ESP / LTD",
+    id: "esp-ltd",
     category: "Guitars",
     description:
       "Modern metal guitars built around fast necks, aggressive shapes, and high-output pickups.",
   },
   {
     name: "Ibanez",
+    id: "ibanez",
     category: "Guitars",
     description:
       "Extended-range instruments, thin necks, and versatile platforms for technical heavy music.",
   },
   {
     name: "Jackson",
+    id: "jackson",
     category: "Guitars",
     description:
       "Sharp designs, fast playability, and a long history across thrash, death metal, and modern metal.",
   },
   {
     name: "Schecter",
+    id: "schecter",
     category: "Guitars",
     description:
       "Feature-packed heavy guitars with extended scale lengths, powerful pickups, and strong value.",
   },
   {
     name: "Peavey",
+    id: "peavey",
     category: "Amplification",
     description:
       "Aggressive high-gain amplification known for tight low end and punishing rhythm tones.",
   },
   {
     name: "Mesa / Boogie",
+    id: "mesa-boogie",
     category: "Amplification",
     description:
       "Premium high-gain amps and cabinets used across metal, hardcore, and heavy touring rigs.",
   },
   {
     name: "Orange",
+    id: "orange",
     category: "Amplification",
     description:
       "Thick British gain, heavy low mids, and powerful tones for doom, sludge, and aggressive rock.",
   },
   {
     name: "Darkglass",
+    id: "darkglass",
     category: "Bass",
     description:
       "Modern bass amplification and drive built for clarity, weight, and aggressive distortion.",
@@ -78,8 +87,12 @@ export default function FeaturedBrands() {
 
         <div className="grid border-l border-t border-white/10 md:grid-cols-2 lg:grid-cols-4">
           {brands.map((brand, index) => (
-            <motion.article
+            <Link
               key={brand.name}
+              to={`/builder?instrument=${brand.id === "darkglass" ? "bass" : "guitar"}&budget=1500&brands=${brand.id}`}
+              className="block"
+            >
+            <motion.article
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
@@ -113,6 +126,7 @@ export default function FeaturedBrands() {
                 </div>
               </div>
             </motion.article>
+            </Link>
           ))}
         </div>
       </div>

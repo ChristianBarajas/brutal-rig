@@ -7,8 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "test": "npm run test:rigs && npm --prefix functions test",
+    "test": "npm run test:rigs && npm run test:app && npm --prefix functions test",
     "test:rigs": "node scripts/verifyGuitarRigs.mjs",
+    "test:app": "node --test src/utils/*.test.js src/services/*.test.js",
     "check": "npm run lint && npm test && npm run build",
     "preview": "vite preview"
   },

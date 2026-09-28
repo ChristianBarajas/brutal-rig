@@ -1,32 +1,32 @@
-import { Guitar, Search, ShieldCheck } from "lucide-react";
+import { BrainCircuit, ListChecks, SlidersHorizontal } from "lucide-react";
 import FeatureCard from "./FeatureCard";
 
 const features = [
   {
     id: 1,
-    icon: <Guitar />,
-    title: "Real Gear Only",
-    text: "Guitars, basses, amps, cabs, pedals, pickups, strings, and accessories. No digital rigs in the MVP.",
+    icon: <SlidersHorizontal />,
+    title: "Tell Us What Matters",
+    text: "Choose an instrument, a real budget, a heavy tone, favorite bands, trusted brands, and how you prefer to shop.",
   },
   {
     id: 2,
-    icon: <Search />,
-    title: "Best Price Hunt",
-    text: "Compare buying paths across Sweetwater, Guitar Center, Reverb, Facebook Marketplace, and OfferUp.",
+    icon: <ListChecks />,
+    title: "The Engine Verifies It",
+    text: "Deterministic rules score real gear, check head-and-cab compatibility, select required cables, and protect the budget.",
   },
   {
     id: 3,
-    icon: <ShieldCheck />,
-    title: "Artist-Inspired Tone",
-    text: "Build rigs inspired by metal and hardcore sounds without pretending to copy exact private setups.",
+    icon: <BrainCircuit />,
+    title: "AI Makes It Usable",
+    text: "On request, AI Rig Tech adds a signal chain, practical starting settings, setup notes, and a realistic upgrade path.",
   },
 ];
 
 export default function Features() {
   return (
     <section
-      id="gear"
-      className="relative z-10 mx-auto grid max-w-7xl gap-5 px-6 pb-28 md:grid-cols-3"
+      id="how-it-works"
+      className="relative z-10 mx-auto grid max-w-7xl gap-5 px-5 py-28 md:grid-cols-3 md:px-6"
     >
       {features.map((feature) => (
         <FeatureCard

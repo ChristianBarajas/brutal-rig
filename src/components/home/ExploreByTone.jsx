@@ -2,36 +2,42 @@ import ToneCard from "./ToneCard";
 
 const tones = [
   {
+    id: "hardcore",
     title: "Hardcore",
     description:
       "Tight low end, aggressive mids, controlled gain, and brutal rhythm clarity built for breakdowns.",
     characteristics: ["Tight", "Percussive", "Aggressive"],
   },
   {
+    id: "metalcore",
     title: "Metalcore",
     description:
       "Modern high-gain tone with clear palm mutes, cutting leads, and enough definition for layered riffs.",
     characteristics: ["Modern", "Clear", "High Gain"],
   },
   {
+    id: "death-metal",
     title: "Death Metal",
     description:
       "Fast attack, heavy saturation, powerful low end, and articulation for technical or crushing riffs.",
     characteristics: ["Heavy", "Fast", "Saturated"],
   },
   {
+    id: "thrash",
     title: "Thrash",
     description:
       "Sharp pick attack, focused mids, restrained low end, and enough bite to cut through fast rhythm work.",
     characteristics: ["Sharp", "Dry", "Focused"],
   },
   {
+    id: "doom-sludge",
     title: "Doom & Sludge",
     description:
       "Massive low end, thick distortion, slower response, and a wall-of-sound character that feels physical.",
     characteristics: ["Huge", "Fuzzy", "Dark"],
   },
   {
+    id: "nu-metal",
     title: "Nu Metal",
     description:
       "Extended low end, scooped aggression, punchy rhythm response, and support for lower tunings.",
@@ -72,6 +78,7 @@ export default function ExploreByTone() {
               description={tone.description}
               characteristics={tone.characteristics}
               number={String(index + 1).padStart(2, "0")}
+              toneId={tone.id}
             />
           ))}
         </div>

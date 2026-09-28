@@ -27,6 +27,10 @@ Brutal Rig compresses that research into one guided workflow. It recommends a co
 - Keeps the complete recommendation inside the selected budget.
 - Explains item-level match scores and the role of every component.
 - Generates an AI Rig Tech plan with a signal chain, starting settings, setup notes, and next upgrade priority.
+- Supports Google and email/password authentication through Firebase Authentication.
+- Saves, reopens, renames, updates, and deletes private user-owned builds in Cloud Firestore.
+- Preserves in-progress builder drafts on the current device so a refresh does not erase the workflow.
+- Turns tone, featured-build, and brand cards into functional builder presets instead of decorative UI.
 - Handles guitar and bass recommendations through the same tested product flow.
 
 ## Why the recommendation engine is hybrid
@@ -50,6 +54,21 @@ flowchart TD
 ```
 
 This separation keeps the core recommendation useful even when the AI service is unavailable and prevents a model response from silently changing the shopping list or budget.
+
+## Accounts and saved rigs
+
+Authentication is optional. Anyone can use the complete recommendation engine and AI Rig Tech without creating an account; sign-in is required only when a user chooses to save a build.
+
+Saved builds use the path `users/{uid}/rigs/{rigId}`. Firestore Security Rules require an authenticated request and verify that the request UID matches the path UID before allowing reads or writes. Each document contains a snapshot of the verified rig, the user's builder preferences, price totals, and the AI tone plan when one has been generated.
+
+Users can:
+
+- Continue a partially completed builder flow from local storage.
+- Save a verified rig after signing in.
+- Update the saved document after generating a new AI tone plan.
+- Open saved builds from a dedicated My Rigs dashboard.
+- Rename or permanently delete their own builds.
+- Use a saved build's preferences as the starting point for a new recommendation.
 
 ## AI Rig Tech integration
 
@@ -85,6 +104,7 @@ The current request limiter is intentionally small and in-memory. Before signifi
 | Build tooling | Vite 8, ESLint |
 | Recommendation engine | JavaScript rules, scoring, pricing, and validation modules |
 | AI backend | Firebase Cloud Functions 2nd gen, Node.js 22, OpenAI Responses API, Structured Outputs |
+| Identity and data | Firebase Authentication, Cloud Firestore, user-scoped Security Rules |
 | Infrastructure | Firebase Hosting, Secret Manager, Google Cloud Run infrastructure |
 | Quality | Node test runner, scenario verification scripts, GitHub Actions |
 
@@ -104,6 +124,8 @@ The single verification command runs:
 - Rig sanitization and malformed-rig rejection tests
 - Structured AI request and response parsing tests
 - Rate-limit behavior tests that confirm the model is not called after a limit
+- Local-draft validation and homepage preset parsing tests
+- Saved-rig snapshot validation and malformed-data rejection tests
 - A complete production build
 
 The same checks run in GitHub Actions on pushes and pull requests.
@@ -122,6 +144,8 @@ npm run dev
 
 The deterministic rig builder works without an API key. AI Rig Tech needs the Firebase function or local emulator.
 
+Firebase Hosting serves the production web configuration from `/__/firebase/init.json`. For account features during Vite local development, copy `.env.example` to `.env.local` and fill it with the public Firebase Web App configuration. These values identify the Firebase project; they do not replace Firestore Security Rules and are not server secrets.
+
 For emulator development, copy `functions/.secret.local.example` to `functions/.secret.local`, replace the placeholder, and keep that file private.
 
 ## Deploy
@@ -130,7 +154,7 @@ Cloud Functions deployment requires a Firebase project on the Blaze plan. Store 
 
 ```bash
 firebase functions:secrets:set OPENAI_API_KEY
-firebase deploy --only functions,hosting
+firebase deploy --only firestore:rules,functions,hosting
 ```
 
 Before exposing an AI endpoint publicly, configure an OpenAI project spend limit and keep automatic credit reload disabled unless ongoing paid usage is intentional.
@@ -140,10 +164,17 @@ Before exposing an AI endpoint publicly, configure an OpenAI project spend limit
 ```text
 src/components/builder/       Six-step preference flow
 src/components/results/       Verified rig and AI Rig Tech UI
+src/components/auth/          Sign-in and account interface
+src/auth/                     Authentication state and actions
 src/data/                     Curated gear and artist profiles
+src/pages/MyRigs.jsx          Private saved-build dashboard
+src/pages/SavedRig.jsx        Saved rig detail and update flow
 src/recommendation/           Budget, pricing, and scoring rules
 src/utils/generateRig.js      Deterministic recommendation orchestration
+src/utils/builderDraft.js     Local draft and preset handling
+src/services/savedRigs.js     Firestore saved-build operations
 src/services/rigTech.js       Client-to-function integration
+firestore.rules               User-scoped data authorization
 functions/src/rigTechCore.js  AI validation, prompt, schema, and parsing
 functions/index.js            Secured Firebase HTTP function
 functions/test/               Backend unit tests
@@ -156,16 +187,18 @@ scripts/                      End-to-end rig scenarios
 - **Progressive enhancement:** the product still solves its main problem without AI.
 - **Structured AI output:** the UI consumes a contract instead of untrusted free-form text.
 - **Server-only secrets:** browser bundles contain no provider credentials.
+- **Optional authentication:** accounts add persistence without blocking the core builder.
+- **User-owned data:** Firestore paths and rules enforce per-user isolation.
 - **Cost-aware infrastructure:** the endpoint has request, instance, concurrency, and account-level spending controls.
 - **Physical gear focus:** recommendations build a real-world signal chain rather than defaulting to plugins or amp simulations.
 
 ## Roadmap
 
-- Firebase Authentication and saved rigs
 - Live retailer or affiliate pricing instead of catalog estimates
 - Larger professional bass and extended-range guitar catalogs
 - Firebase App Check and distributed production rate limiting
 - Shareable rig URLs and comparison views
+- Password reset, email verification, and account deletion
 - Accessibility and device-level end-to-end tests
 
 ## Developer

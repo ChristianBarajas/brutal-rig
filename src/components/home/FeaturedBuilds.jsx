@@ -8,6 +8,7 @@ const builds = [
     budget: "$1,500",
     instrument: "Guitar Rig",
     gear: ["LTD", "High-Output Pickups", "6505", "2x12 Cab"],
+    href: "/builder?instrument=guitar&budget=1500&tone=hardcore&bands=Knocked%20Loose%7CKublai%20Khan%20TX&brands=esp-ltd%7Cpeavey",
     featured: true,
   },
   {
@@ -17,6 +18,7 @@ const builds = [
     budget: "$850",
     instrument: "Guitar Rig",
     gear: ["Schecter", "Humbuckers", "High-Gain Combo"],
+    href: "/builder?instrument=guitar&budget=800&tone=metalcore&bands=Architects&brands=schecter",
   },
   {
     title: "Doom Wall",
@@ -25,6 +27,7 @@ const builds = [
     budget: "$2,100",
     instrument: "Guitar Rig",
     gear: ["Les Paul Style", "Orange", "4x12 Cab", "Fuzz"],
+    href: "/builder?instrument=guitar&budget=2100&tone=doom-sludge&brands=orange",
   },
   {
     title: "Touring Bass",
@@ -33,6 +36,7 @@ const builds = [
     budget: "$2,400",
     instrument: "Bass Rig",
     gear: ["5-String Bass", "Active Pickups", "Bass Head", "4x10 Cab"],
+    href: "/builder?instrument=bass&budget=2400&tone=death-metal&bands=Meshuggah%7CGojira&brands=darkglass",
     featured: true,
   },
 ];
@@ -71,6 +75,7 @@ export default function FeaturedBuilds() {
               budget={build.budget}
               instrument={build.instrument}
               gear={build.gear}
+              href={build.href}
               featured={build.featured}
             />
           ))}

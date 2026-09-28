@@ -67,7 +67,7 @@ export default function BudgetStep({
   );
 
   return (
-    <section className="relative flex min-h-screen items-center px-6 py-32">
+    <section className="relative flex min-h-screen items-center px-5 pb-32 pt-48 md:px-6">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.09),_transparent_34%),linear-gradient(to_bottom,_#050505,_#090909,_#050505)]" />
 
       <motion.div

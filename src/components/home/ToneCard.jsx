@@ -1,13 +1,16 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function ToneCard({
   title,
   description,
   characteristics,
   number,
+  toneId,
 }) {
   return (
+    <Link to={`/builder?instrument=guitar&tone=${toneId}&budget=1500`} className="block">
     <motion.article
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -55,5 +58,6 @@ export default function ToneCard({
         </div>
       </div>
     </motion.article>
+    </Link>
   );
 }

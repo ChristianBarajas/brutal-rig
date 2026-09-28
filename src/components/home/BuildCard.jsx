@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function BuildCard({
   title,
@@ -7,9 +8,11 @@ export default function BuildCard({
   budget,
   instrument,
   gear,
+  href,
   featured = false,
 }) {
   return (
+    <Link to={href} className={featured ? "md:col-span-2" : ""}>
     <motion.article
       initial={{ opacity: 0, y: 32 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -17,7 +20,7 @@ export default function BuildCard({
       transition={{ duration: 0.55 }}
       whileHover={{ y: -8 }}
       className={`group relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#0b0b0b] p-8 ${
-        featured ? "md:col-span-2" : ""
+        featured ? "h-full" : "h-full"
       }`}
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(255,255,255,0.12),_transparent_34%)] opacity-40 transition duration-500 group-hover:opacity-100" />
@@ -67,14 +70,14 @@ export default function BuildCard({
             <p className="mt-2 text-3xl font-black text-white">{budget}</p>
           </div>
 
-          <button
-            type="button"
+          <span
             className="rounded-full border border-white/15 px-5 py-3 text-xs font-black uppercase tracking-widest text-white transition hover:border-white hover:bg-white hover:text-black"
           >
-            View Build
-          </button>
+            Use This Profile
+          </span>
         </div>
       </div>
     </motion.article>
+    </Link>
   );
 }

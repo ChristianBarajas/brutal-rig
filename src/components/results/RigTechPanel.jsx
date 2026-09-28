@@ -24,9 +24,9 @@ function SectionTitle({ icon: Icon, children }) {
   );
 }
 
-export default function RigTechPanel({ rig }) {
-  const [status, setStatus] = useState("idle");
-  const [advice, setAdvice] = useState(null);
+export default function RigTechPanel({ rig, initialAdvice = null, onAdviceChange }) {
+  const [status, setStatus] = useState(initialAdvice ? "success" : "idle");
+  const [advice, setAdvice] = useState(initialAdvice);
   const [errorMessage, setErrorMessage] = useState("");
 
   async function handleAnalyzeRig() {
@@ -37,6 +37,7 @@ export default function RigTechPanel({ rig }) {
       const nextAdvice = await requestRigTechAdvice(rig);
       setAdvice(nextAdvice);
       setStatus("success");
+      onAdviceChange?.(nextAdvice);
     } catch (error) {
       setAdvice(null);
       setErrorMessage(
