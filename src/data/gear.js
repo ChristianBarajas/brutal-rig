@@ -148,6 +148,7 @@ export const gear = {
           "death-metal",
           "thrash",
           "nu-metal",
+          "doom-sludge",
         ],
         useCases: ["starter", "practice", "recording"],
         description:

@@ -120,6 +120,7 @@ The single verification command runs:
 - Guitar budget scenarios from $400 to $4,100
 - Bass budget scenarios from $500 to $4,100
 - New-only, used-first, and best-value pricing scenarios
+- A 144-scenario preference matrix across both instruments, all six tones, four budget levels, three shopping modes, and tone-appropriate band influences
 - Server request-method and payload validation tests
 - Rig sanitization and malformed-rig rejection tests
 - Structured AI request and response parsing tests
