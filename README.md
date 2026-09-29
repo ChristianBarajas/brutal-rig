@@ -3,208 +3,105 @@
 </p>
 
 <p align="center">
-  A full-stack recommendation platform that builds complete physical guitar and bass rigs for metal and hardcore musicians—then uses AI to turn each verified build into a practical tone plan.
+  <strong>Build the rig. Find your sound.</strong><br />
+  A guitar and bass rig builder for metal, hardcore, and everything heavy.
 </p>
 
 <p align="center">
-  <a href="https://brutal-rig.web.app"><strong>Live application</strong></a> ·
-  <a href="https://github.com/ChristianBarajas/brutal-rig">Source code</a>
+  <a href="https://brutal-rig.web.app"><strong>Try Brutal Rig</strong></a> ·
+  <a href="https://github.com/ChristianBarajas/brutal-rig">View the source</a>
 </p>
 
-## The problem
+## Built for players
 
-Building a heavy rig usually means hours of YouTube reviews, forum threads, compatibility checks, and price comparisons. Generic gear lists also miss the details that matter: the player's budget, instrument, favorite bands, preferred brands, shopping preference, and whether every part of the signal chain actually works together.
+You know the sound you want. Finding a complete setup that fits your budget takes more work: comparing guitars, amps, cabinets, pedals, and used prices; checking what connects; and figuring out which parts actually matter for your style.
 
-Brutal Rig compresses that research into one guided workflow. It recommends a complete physical rig, explains each choice, verifies the total, and produces usable starting settings for the exact gear selected.
+**Brutal Rig turns those decisions into a playable starting point.** Choose guitar or bass, set a total budget, pick a heavy tone, and add the bands and brands you care about. The builder assembles a physical rig from a curated catalog, explains why each piece fits, and shows the estimated cost of the entire setup. When you want to go deeper, AI Rig Tech turns that exact gear list into practical tone guidance.
 
-## What the application does
+The builder is open to everyone. Sign in only when you want to keep your rigs across devices.
 
-- Builds guitar and bass rigs across entry-level, midrange, and professional budgets.
-- Supports hardcore, metalcore, death metal, thrash, nu-metal, and doom/sludge tone profiles.
-- Scores favorite bands and preferred brands against a curated physical-gear catalog.
-- Supports best-value, new-only, and used-first shopping strategies.
-- Validates instruments, amplification, tuners, required cables, and head/cab compatibility.
-- Keeps the complete recommendation inside the selected budget.
-- Explains item-level match scores and the role of every component.
-- Generates an AI Rig Tech plan with a signal chain, starting settings, setup notes, and next upgrade priority.
-- Supports Google and email/password authentication through Firebase Authentication.
-- Saves, reopens, renames, updates, and deletes private user-owned builds in Cloud Firestore.
-- Preserves in-progress builder drafts on the current device so a refresh does not erase the workflow.
-- Turns tone, featured-build, and brand cards into functional builder presets instead of decorative UI.
-- Handles guitar and bass recommendations through the same tested product flow.
+## The player experience
 
-## Why the recommendation engine is hybrid
+1. **Describe your sound.** Choose an instrument, budget, tone, artist influences, preferred brands, and whether to shop for value, new gear, or used gear first.
+2. **See a complete rig.** Get an instrument, amplification, tuning tools, required cables, and any pedals or accessories the budget can support. The result includes item-level reasons, estimated prices, and a total.
+3. **Explore the gear.** Browse consistent studio-style visuals and open shopping searches for each item. Listings let you verify the exact model, condition, and current price.
+4. **Dial it in.** Ask AI Rig Tech for a signal chain, starting settings, setup notes, and an upgrade priority based on the gear in your build.
+5. **Make it yours.** Tell Refine My Rig something like “make it more hardcore and keep the complete rig under $1,200.” Preview the interpreted preferences, changed gear, and new estimated total before applying anything.
+6. **Keep what works.** Save builds to a private account, reopen them, rename them, and revisit their AI tone plans.
 
-The AI model is not trusted with shopping math, prices, or product compatibility. Those are deterministic software-engineering problems, so the local recommendation engine handles them first.
+Brutal Rig supports guitar and bass; hardcore, metalcore, death metal, thrash, doom/sludge, and nu metal; and starter through professional budgets. It also keeps an unfinished builder draft on the current device.
 
-1. The user submits budget, instrument, tone, band, brand, and shopping preferences.
-2. JavaScript scoring rules rank items from the curated catalog.
-3. Budget and compatibility rules assemble and validate the complete physical rig.
-4. The React results page renders the verified products, prices, and explanations.
-5. On request, the server sends only the sanitized, already-verified rig to OpenAI.
-6. Structured Outputs return a predictable tone plan that the UI can validate and render.
+## How the recommendations work
+
+The gear catalog contains instruments, amplifiers, cabinets, tuners, pedals, and essentials with prices and attributes. JavaScript recommendation rules score the options against the player's preferences, assemble a complete signal chain, check amplifier and cabinet compatibility, and calculate the total. The results page shows the selected condition and the reason each item earned its place.
+
+This gives the AI a solid foundation: it can help a player understand and revise a rig while catalog rules remain responsible for product selection, connections, and budget math.
 
 ```mermaid
 flowchart TD
-    A[Player preferences] --> B[Scoring and budget rules]
-    B --> C[Verified physical rig]
-    C --> D[React results]
-    C --> E[Firebase AI endpoint]
-    E --> F[Structured tone plan]
+    A["Player preferences"] --> B["Catalog scoring and compatibility"]
+    B --> C["Complete rig and estimated total"]
+    C --> D["Results, visuals, and shopping searches"]
+    C --> E["AI Rig Tech"]
+    F["Plain-English refinement"] --> G["Validated preference changes"]
+    G --> B
 ```
 
-This separation keeps the core recommendation useful even when the AI service is unavailable and prevents a model response from silently changing the shopping list or budget.
+### Two ways AI helps
 
-## Accounts and saved rigs
+**AI Rig Tech** receives a sanitized snapshot of the finished rig through a Firebase Cloud Function. It uses the OpenAI Responses API to return a structured tone plan: summary, signal chain, gear-specific starting settings, setup notes, and an upgrade priority. Its instructions keep the advice tied to the items already selected.
 
-Authentication is optional. Anyone can use the complete recommendation engine and AI Rig Tech without creating an account; sign-in is required only when a user chooses to save a build.
+**Refine My Rig** translates a player's request into supported builder choices: instrument, budget, tone, listed bands and brands, or shopping preference. The server validates the structured response against allowed values and budget limits. The browser then runs the regular recommendation engine to preview the resulting gear. The player decides whether to apply it, and a previously saved rig is left intact.
 
-Saved builds use the path `users/{uid}/rigs/{rigId}`. Firestore Security Rules require an authenticated request and verify that the request UID matches the path UID before allowing reads or writes. Each document contains a snapshot of the verified rig, the user's builder preferences, price totals, and the AI tone plan when one has been generated.
+Both AI features run only when requested. The product still builds rigs when AI is unavailable. Exact tunings and physical setups are flagged as details to verify because they are not current builder constraints.
 
-Users can:
+## Accounts and the full-stack system
 
-- Continue a partially completed builder flow from local storage.
-- Save a verified rig after signing in.
-- Update the saved document after generating a new AI tone plan.
-- Open saved builds from a dedicated My Rigs dashboard.
-- Rename or permanently delete their own builds.
-- Use a saved build's preferences as the starting point for a new recommendation.
+The interface is a React and Vite application with responsive Tailwind CSS styling and Framer Motion interactions. Firebase Hosting serves the site and routes AI requests to Node.js Cloud Functions. The OpenAI key stays in Firebase Secret Manager; the browser calls Brutal Rig's endpoints rather than OpenAI directly.
 
-## AI Rig Tech integration
+Firebase Authentication supports Google and email/password sign-in. Cloud Firestore stores user-owned rig snapshots and optional AI plans at `users/{uid}/rigs/{rigId}`. Security Rules limit access to the matching signed-in user. Local storage preserves an unfinished builder session without requiring an account.
 
-AI Rig Tech is a secure server-side feature built with Firebase Cloud Functions and the OpenAI Responses API.
-
-The request includes the generated rig, selected tone, favorite bands, instrument type, budget, total, and remaining budget. The model is instructed to work only with those products and return:
-
-- A short tonal summary
-- An ordered signal chain
-- Component-specific starting settings with explanations
-- Setup and safety notes
-- One realistic next-upgrade priority
-
-The response uses a strict JSON schema. Incomplete or malformed output is rejected before it reaches the interface. The client never receives the OpenAI API key and never calls OpenAI directly.
-
-### Production safeguards
-
-- `OPENAI_API_KEY` is stored in Firebase Secret Manager.
-- The OpenAI key is restricted to the Responses API and its project is model-limited.
-- Requests and generated rigs are sanitized and schema-validated server-side.
-- Requests are limited per client before the model is called.
-- The function is capped at one instance with low concurrency to control burst cost.
-- Prompts prohibit replacements, price changes, unlisted products, and software amp sims.
-- OpenAI billing uses a separate project with auto-reload disabled and a hard spend limit.
-
-The current request limiter is intentionally small and in-memory. Before significant public traffic, the next step is Firebase App Check plus a distributed limiter such as Firestore or Redis.
-
-## Tech stack
-
-| Layer | Technology |
+| Layer | Implementation |
 | --- | --- |
-| Interface | React 19, React Router, Tailwind CSS 4, Framer Motion, Lucide React |
-| Build tooling | Vite 8, ESLint |
-| Recommendation engine | JavaScript rules, scoring, pricing, and validation modules |
-| AI backend | Firebase Cloud Functions 2nd gen, Node.js 22, OpenAI Responses API, Structured Outputs |
-| Identity and data | Firebase Authentication, Cloud Firestore, user-scoped Security Rules |
-| Infrastructure | Firebase Hosting, Secret Manager, Google Cloud Run infrastructure |
-| Quality | Node test runner, scenario verification scripts, GitHub Actions |
+| Web app | React 19, React Router, Vite 8, Tailwind CSS 4, Framer Motion |
+| Recommendations | Curated JavaScript gear catalog, scoring, pricing, budget and compatibility rules |
+| AI | OpenAI Responses API, strict JSON schemas, Firebase Cloud Functions on Node.js 22 |
+| Accounts and data | Firebase Authentication, Cloud Firestore, user-scoped Security Rules |
+| Delivery and checks | Firebase Hosting, GitHub Actions, ESLint, Node tests, scenario scripts |
 
-## Testing and quality gates
+AI requests are validated and rate limited before model use. Responses are checked before they reach the interface. The functions cap instances and concurrency to limit bursts. The current request limiter is in memory per function instance; a distributed limiter and App Check would be appropriate at larger scale.
+
+## Product notes
+
+- Prices are **catalog estimates**, including used-condition estimates. Shopping buttons open searches; Brutal Rig does not provide live stock, checkout, or guaranteed retailer pricing.
+- Most gear visuals are generated illustrations for browsing, with a credited adapted Boss SD-1 photograph. Verify exact finishes, model details, and packaging on the retailer listing.
+- Tone settings are starting points for the player's instrument, room, and hands. The builder does not guarantee an exact artist tone or a particular physical setup.
+- If no complete setup fits a requested refinement, the player sees an error and can adjust the budget or shopping preference.
+
+## Run and verify
+
+Requirements: Node.js 22+, npm, and a Firebase project for account and AI features.
 
 ```bash
+npm ci
+npm ci --prefix functions
 npm run check
-```
-
-The single verification command runs:
-
-- ESLint across the application and function code
-- Guitar budget scenarios from $400 to $4,100
-- Bass budget scenarios from $500 to $4,100
-- New-only, used-first, and best-value pricing scenarios
-- A 144-scenario preference matrix across both instruments, all six tones, four budget levels, three shopping modes, and tone-appropriate band influences
-- Server request-method and payload validation tests
-- Rig sanitization and malformed-rig rejection tests
-- Structured AI request and response parsing tests
-- Rate-limit behavior tests that confirm the model is not called after a limit
-- Local-draft validation and homepage preset parsing tests
-- Saved-rig snapshot validation and malformed-data rejection tests
-- A complete production build
-
-The same checks run in GitHub Actions on pushes and pull requests.
-
-## Run locally
-
-Requirements: Node.js 22+ and npm.
-
-```bash
-git clone https://github.com/ChristianBarajas/brutal-rig.git
-cd brutal-rig
-npm install
-npm install --prefix functions
 npm run dev
 ```
 
-The deterministic rig builder works without an API key. AI Rig Tech needs the Firebase function or local emulator.
+`npm run check` runs ESLint, guitar and bass budget scenarios, a 144-scenario preference matrix, application and Cloud Function tests, and a production build. The same checks run in GitHub Actions.
 
-Firebase Hosting serves the production web configuration from `/__/firebase/init.json`. For account features during Vite local development, copy `.env.example` to `.env.local` and fill it with the public Firebase Web App configuration. These values identify the Firebase project; they do not replace Firestore Security Rules and are not server secrets.
+The catalog builder works in the Vite development server without an API key. For local authentication, copy `.env.example` to `.env.local` and supply the Firebase Web App configuration. The plain Vite server does not serve Firebase's `/api` rewrites; AI requests need the deployed functions or a locally configured Functions emulator. Keep the OpenAI key server-side in Firebase Secret Manager or a private emulator secret file.
 
-For emulator development, copy `functions/.secret.local.example` to `functions/.secret.local`, replace the placeholder, and keep that file private.
-
-## Deploy
-
-Cloud Functions deployment requires a Firebase project on the Blaze plan. Store the key server-side and deploy both surfaces:
+To deploy the site and backend after a successful build:
 
 ```bash
-firebase functions:secrets:set OPENAI_API_KEY
+firebase use brutal-rig
 firebase deploy --only firestore:rules,functions,hosting
 ```
 
-Before exposing an AI endpoint publicly, configure an OpenAI project spend limit and keep automatic credit reload disabled unless ongoing paid usage is intentional.
+## Creator
 
-## Project structure
+Built by **Christian Barajas**, a full-stack developer and guitarist from Diamond Bar, California, and a Computer Science graduate of California State University, Fullerton.
 
-```text
-src/components/builder/       Six-step preference flow
-src/components/results/       Verified rig and AI Rig Tech UI
-src/components/auth/          Sign-in and account interface
-src/auth/                     Authentication state and actions
-src/data/                     Curated gear and artist profiles
-src/pages/MyRigs.jsx          Private saved-build dashboard
-src/pages/SavedRig.jsx        Saved rig detail and update flow
-src/recommendation/           Budget, pricing, and scoring rules
-src/utils/generateRig.js      Deterministic recommendation orchestration
-src/utils/builderDraft.js     Local draft and preset handling
-src/services/savedRigs.js     Firestore saved-build operations
-src/services/rigTech.js       Client-to-function integration
-firestore.rules               User-scoped data authorization
-functions/src/rigTechCore.js  AI validation, prompt, schema, and parsing
-functions/index.js            Secured Firebase HTTP function
-functions/test/               Backend unit tests
-scripts/                      End-to-end rig scenarios
-```
-
-## Engineering decisions
-
-- **Deterministic before generative:** prices, products, compatibility, and totals remain auditable.
-- **Progressive enhancement:** the product still solves its main problem without AI.
-- **Structured AI output:** the UI consumes a contract instead of untrusted free-form text.
-- **Server-only secrets:** browser bundles contain no provider credentials.
-- **Optional authentication:** accounts add persistence without blocking the core builder.
-- **User-owned data:** Firestore paths and rules enforce per-user isolation.
-- **Cost-aware infrastructure:** the endpoint has request, instance, concurrency, and account-level spending controls.
-- **Physical gear focus:** recommendations build a real-world signal chain rather than defaulting to plugins or amp simulations.
-
-## Roadmap
-
-- Live retailer or affiliate pricing instead of catalog estimates
-- Larger professional bass and extended-range guitar catalogs
-- Firebase App Check and distributed production rate limiting
-- Shareable rig URLs and comparison views
-- Password reset, email verification, and account deletion
-- Accessibility and device-level end-to-end tests
-
-## Developer
-
-Built by **Christian Barajas**, a Computer Science graduate from California State University, Fullerton.
-
-- [GitHub](https://github.com/ChristianBarajas)
-- [Live application](https://brutal-rig.web.app)
+[Live app](https://brutal-rig.web.app) · [GitHub](https://github.com/ChristianBarajas) · [Portfolio](https://christian-barajas-portfolio.web.app)
