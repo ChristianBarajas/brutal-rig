@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BookMarked, ChevronDown, LogOut, Menu, UserRound, X } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth";
 import AuthModal from "../auth/AuthModal";
 
@@ -10,14 +10,35 @@ const links = [
   { name: "Builds", href: "/#builds" },
 ];
 
+const searchGearUrl = import.meta.env.VITE_SEARCH_GEAR_URL?.trim() ||
+  (import.meta.env.DEV ? "http://localhost:3000" : "");
+
 export default function Navbar() {
   const { user, status, signOut } = useAuth();
   const location = useLocation();
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const navigate = useNavigate();
+  const [signInRequested] = useState(() =>
+    new URLSearchParams(window.location.search).get("signIn") === "1",
+  );
+  const [isAuthOpen, setIsAuthOpen] = useState(signInRequested);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const isBuilder = location.pathname === "/builder";
   const userLabel = user?.displayName || user?.email?.split("@")[0] || "Account";
+
+  useEffect(() => {
+    if (!signInRequested || status === "loading") {
+      return;
+    }
+
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("signIn") === "1") {
+      url.searchParams.delete("signIn");
+      window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
+    }
+
+    if (user) navigate("/my-rigs", { replace: true });
+  }, [navigate, signInRequested, status, user]);
 
   function closeMenus() {
     setIsMobileOpen(false);
@@ -45,6 +66,14 @@ export default function Navbar() {
           </Link>
 
           <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary navigation">
+            {searchGearUrl && (
+              <a
+                href={searchGearUrl}
+                className="text-xs font-bold uppercase tracking-[0.18em] text-red-300 transition hover:text-white"
+              >
+                Search Gear
+              </a>
+            )}
             {links.map((link) => (
               <a
                 key={link.name}
@@ -131,6 +160,15 @@ export default function Navbar() {
         {isMobileOpen && (
           <nav className="border-t border-white/10 bg-[#080808] px-5 py-5 lg:hidden" aria-label="Mobile navigation">
             <div className="mx-auto grid max-w-7xl gap-2">
+              {searchGearUrl && (
+                <a
+                  href={searchGearUrl}
+                  onClick={closeMenus}
+                  className="rounded-xl px-4 py-3 text-sm font-black uppercase tracking-wider text-red-300 hover:bg-white/[0.04] hover:text-white"
+                >
+                  Search Gear
+                </a>
+              )}
               {links.map((link) => (
                 <a
                   key={link.name}
@@ -178,7 +216,7 @@ export default function Navbar() {
         )}
       </header>
 
-      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+      <AuthModal isOpen={isAuthOpen && status !== "loading" && !user} onClose={() => setIsAuthOpen(false)} />
     </>
   );
 }

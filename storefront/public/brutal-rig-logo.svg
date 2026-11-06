@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 160" role="img" aria-labelledby="title desc">
+  <title id="title">Brutal Rig</title>
+  <desc id="desc">Brutal Rig angular BR monogram and wordmark.</desc>
+  <rect width="720" height="160" rx="28" fill="#050505"/>
+  <g transform="translate(20 16) scale(.88)">
+    <path d="M28 25h40c20 0 31 9 31 24 0 9-4 16-13 20 11 4 17 12 17 23 0 7-2 13-6 18L78 86c-2-3-6-5-12-5H51v22H28V25Zm23 19v18h15c7 0 11-3 11-9s-4-9-11-9H51Zm40 66L66 78h25l25 32H91Z" fill="#f5f5f5"/>
+    <path d="M28 110h88" stroke="#71717a" stroke-width="4"/>
+  </g>
+  <text x="154" y="88" fill="#f5f5f5" font-family="Arial Black, Arial, sans-serif" font-size="50" font-weight="900" letter-spacing="11">BRUTAL RIG</text>
+  <text x="158" y="119" fill="#a1a1aa" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="5">BUILD HEAVY. BUY SMART.</text>
+</svg>

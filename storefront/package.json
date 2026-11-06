@@ -1,0 +1,20 @@
+{
+  "name": "brutal-rig-storefront",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@apollo/client": "^4.0.0",
+    "graphql": "^16.11.0",
+    "graphql-yoga": "^6.0.0",
+    "next": "^16.4.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "rxjs": "^7.8.0"
+  }
+}
