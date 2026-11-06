@@ -10,6 +10,9 @@ import {
   Sparkles,
 } from "lucide-react";
 import RigTechPanel from "./RigTechPanel";
+import RefineRigPanel from "./RefineRigPanel";
+import GearMedia from "./GearMedia";
+import GearShopping from "./GearShopping";
 
 export default function RigResults({
   rig,
@@ -19,6 +22,7 @@ export default function RigResults({
   saveStatus = "idle",
   initialAdvice = null,
   onAdviceChange,
+  onApplyRefinement,
   savedView = false,
 }) {
   return (
@@ -60,6 +64,8 @@ export default function RigResults({
           </div>
         </motion.div>
 
+        {onApplyRefinement && <RefineRigPanel key={rig.id} rig={rig} onApply={onApplyRefinement} />}
+
         <div className="mt-16 grid gap-5 lg:grid-cols-[1fr_360px]">
           <div className="space-y-5">
             {rig.items.map((item, index) => {
@@ -77,6 +83,7 @@ export default function RigResults({
                   }}
                   className="group rounded-3xl border border-white/10 bg-white/[0.025] p-7 transition hover:border-white/30 hover:bg-white/[0.05]"
                 >
+                  <GearMedia key={item.id} item={item} />
                   <div className="flex flex-col justify-between gap-6 md:flex-row">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-3">
@@ -153,6 +160,7 @@ export default function RigResults({
                       )}
                     </div>
                   </div>
+                  <GearShopping item={item} />
                 </motion.article>
               );
             })}
@@ -279,6 +287,7 @@ export default function RigResults({
         </div>
 
         <RigTechPanel
+          key={rig.id}
           rig={rig}
           initialAdvice={initialAdvice}
           onAdviceChange={onAdviceChange}

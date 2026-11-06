@@ -188,6 +188,17 @@ export default function RigBuilder() {
     saveCurrentRig();
   }
 
+  function handleApplyRefinement(nextPreferences, nextRig) {
+    setBuilderData(nextPreferences);
+    setGeneratedRig(nextRig);
+    setAdvice(null);
+    setSavedRigId(null);
+    setSaveStatus("idle");
+    setSaveMessage("");
+    setGenerationError("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   function handleStartOver() {
     clearBuilderDraft();
     setBuilderData(createInitialBuilderData());
@@ -263,6 +274,7 @@ export default function RigBuilder() {
             }
           }}
           onSave={handleSaveRig}
+          onApplyRefinement={handleApplyRefinement}
           saveStatus={saveStatus}
           onEditPreferences={() => setCurrentStep(6)}
           onStartOver={handleStartOver}

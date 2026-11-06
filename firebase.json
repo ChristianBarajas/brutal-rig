@@ -16,6 +16,14 @@
     ],
     "rewrites": [
       {
+        "source": "/api/refine-rig",
+        "function": {
+          "functionId": "refineRig",
+          "region": "us-west1",
+          "pinTag": true
+        }
+      },
+      {
         "source": "/api/rig-tech",
         "function": {
           "functionId": "rigTech",

@@ -8,6 +8,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import HeroVideo from "./HeroVideo";
 
 const rigItems = [
   { type: "Guitar", name: "ESP LTD EC-1000", price: "$849" },
@@ -21,6 +22,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_18%,_rgba(239,68,68,0.20),_transparent_28%),radial-gradient(circle_at_20%_0%,_rgba(255,255,255,0.08),_transparent_25%),linear-gradient(to_bottom,_#050505,_#080808_72%,_#050505)]" />
       <div className="absolute inset-0 opacity-[0.025] [background-image:linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)] [background-size:56px_56px]" />
 
+      <HeroVideo />
       <div className="relative z-10 mx-auto grid min-h-[calc(100vh-10rem)] max-w-7xl items-center gap-16 lg:grid-cols-[1.02fr_0.98fr]">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

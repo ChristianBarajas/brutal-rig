@@ -292,7 +292,7 @@ export function parseRigTechAdvice(outputText) {
   return advice;
 }
 
-function getClientId(request) {
+export function getClientId(request) {
   if (typeof request.ip === "string" && request.ip.trim()) {
     return request.ip.trim();
   }
