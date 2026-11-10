@@ -1,3 +1,7 @@
-const nextConfig = { output: "standalone" };
+const nextConfig = {
+  output: "standalone",
+  outputFileTracingRoot: process.cwd(),
+  turbopack: { root: process.cwd() },
+};
 
 export default nextConfig;
