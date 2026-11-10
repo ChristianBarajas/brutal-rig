@@ -11,7 +11,7 @@ const links = [
 ];
 
 const searchGearUrl = import.meta.env.VITE_SEARCH_GEAR_URL?.trim() ||
-  (import.meta.env.DEV ? "http://localhost:3000" : "");
+  (import.meta.env.DEV ? "http://localhost:3000" : "https://search-gear--brutal-rig.us-central1.hosted.app");
 
 export default function Navbar() {
   const { user, status, signOut } = useAuth();
