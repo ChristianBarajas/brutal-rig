@@ -1,6 +1,6 @@
 import { readdirSync } from "node:fs";
 import path from "node:path";
-import { gear } from "../../src/data/gear.js";
+import { gear } from "./generatedGear.js";
 
 const imageIds = new Set(
   readdirSync(path.join(process.cwd(), "public", "gear"))

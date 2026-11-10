@@ -1,7 +1,3 @@
-import path from "node:path";
-
-const nextConfig = {
-  outputFileTracingRoot: path.resolve(process.cwd(), ".."),
-};
+const nextConfig = { output: "standalone" };
 
 export default nextConfig;
